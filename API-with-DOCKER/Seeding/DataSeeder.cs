@@ -19,6 +19,10 @@ namespace API_with_DOCKER.Seeding
         {
             _context = context;
         }
+
+
+
+
         public async Task SeedCustomerValuesAsync(CancellationToken cancellationToken)
         {
             var existingCustomers = await _context.Customers.CountAsync(cancellationToken);
@@ -41,6 +45,11 @@ namespace API_with_DOCKER.Seeding
                 _context.ChangeTracker.Clear();
             }
         }
+
+
+
+
+
         public async Task SeedProductValuesAsync(CancellationToken cancellationToken)
         {
             var existingProducts = await _context.Products.CountAsync(cancellationToken);
@@ -68,6 +77,10 @@ namespace API_with_DOCKER.Seeding
                 _context.ChangeTracker.Clear();
             }
         }
+
+
+
+
         public async Task SeedOrderValuesAsync(CancellationToken cancellationToken)
         {
             var existingOrders= await _context.Orders.CountAsync(cancellationToken);
