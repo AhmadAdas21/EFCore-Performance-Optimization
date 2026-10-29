@@ -5,7 +5,7 @@
         public int OrderId { get; init; }
         public int CustomerId { get; init; } 
         public DateTime CreatedDate { get; init; }
-        public decimal TotalCoast { get; init; }
+        public decimal TotalCost { get; init; }
         public int ItemCount { get; init; }
     }
 }
