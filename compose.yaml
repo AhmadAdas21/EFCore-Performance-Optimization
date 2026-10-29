@@ -3,13 +3,13 @@ services:
     build:
       context: .
       dockerfile: API-with-DOCKER/DockerFile
-    image: api-with-docker:v1
+    image: efcore-performance-api:v1
     ports:
-      - "8085:8080"
+      - "8086:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=ApiWithDockerDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=EFCorePerformanceDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
       Redis__ConnectionString: "redis:6379"
     depends_on:
       sqlserver:
