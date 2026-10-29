@@ -53,17 +53,81 @@ namespace API_with_DOCKER.Seeding
                 List<Product> products = new List<Product>();
                 for(int j = 0; j < ChunkSize; j++)
                 {
+                    int productNumber = i * ChunkSize + j + 1;
                     products.Add(new Product
                     {
-                        Name = $"product_num is {i * ChunkSize + j + 1}",
-                        Description = $"description for product {i * ChunkSize + j + 1}",
-                        Price = (decimal)(new Random().NextDouble() * 100),
-                        StockQuantity = new Random().Next(1, 100)
+                        Name = $"product_num is {productNumber}",
+                        Description = $"description for product {productNumber}",
+                        Price = (decimal)(productNumber%2==0? 50 : productNumber*1),
+                        StockQuantity = productNumber * 5,
+                        IsActive = productNumber % 2 == 0 ? true : false
                     });
                 }
                 await _context.Products.AddRangeAsync(products, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
                 _context.ChangeTracker.Clear();
+            }
+        }
+        public async Task SeedOrderValuesAsync(CancellationToken cancellationToken)
+        {
+            var existingOrders= await _context.Orders.CountAsync(cancellationToken);
+            if (existingOrders > 0)
+            {
+                throw new InvalidOperationException("orders already exist in the database.");
+            }
+            var customersId = await _context.Customers.Select(Customer=>Customer.Id).ToListAsync(cancellationToken);
+            if (customersId.Count <= 0)
+            {
+                throw new InvalidOperationException("No customers found in the database.");
+            }
+            var products= await _context.Products.OrderBy(p => p.Id).Select(p => new
+                                                                    {
+                                                                      p.Id,
+                                                                      p.Price
+                                                                    }).ToListAsync(cancellationToken); ;
+            if(products.Count <= 0)
+            {
+                throw new InvalidOperationException("No products found in the database.");
+            }
+            for (int i = 0; i < 50; i++)
+            {
+                List<Order> orders = new List<Order>();
+                for (int j = 0; j < ChunkSize; j++)
+                {
+                    int orderNumber = i * ChunkSize + j + 1;
+                    orders.Add(new Order
+                    {
+                        CustomerId = customersId[(orderNumber - 1) % customersId.Count],
+                        Items = new List<OrderItem>
+                        {
+                            new OrderItem
+                            {
+                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                Quantity = 1,
+                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                            },
+                            new OrderItem
+                            {
+                                 ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                Quantity = 1,
+                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                            },
+                            new OrderItem
+                            {
+                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                Quantity = 1,
+                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                            },
+                            new OrderItem{
+                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                Quantity = 1,
+                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                            }
+                        },
+                        Subtotal = 0,
+                        TotalCost = 0
+                    });
+                }
             }
         }
 
