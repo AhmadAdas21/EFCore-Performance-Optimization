@@ -1,4 +1,4 @@
-namespace Slow_Api
+namespace API_with_DOCKER
 {
     public class WeatherForecast
     {

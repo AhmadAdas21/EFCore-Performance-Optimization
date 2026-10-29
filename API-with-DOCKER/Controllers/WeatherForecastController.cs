@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Slow_Api.Controllers
+namespace API_with_DOCKER.Controllers
 {
     [ApiController]
     [Route("[controller]")]
