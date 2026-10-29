@@ -85,7 +85,7 @@ namespace API_with_DOCKER.Seeding
                                                                       p.Id,
                                                                       p.Price
                                                                     }).ToListAsync(cancellationToken); ;
-            if(products.Count <= 0)
+            if(products.Count <4)
             {
                 throw new InvalidOperationException("No products found in the database.");
             }
@@ -95,39 +95,52 @@ namespace API_with_DOCKER.Seeding
                 for (int j = 0; j < ChunkSize; j++)
                 {
                     int orderNumber = i * ChunkSize + j + 1;
+                    int k = (orderNumber - 1) * 4;
+                    var product1 = products[k % products.Count];
+                    var product2 = products[(k + 1) % products.Count];
+                    var product3 = products[(k + 2) % products.Count];
+                    var product4 = products[(k + 3) % products.Count];
+
+                    decimal subtotal =product1.Price + product2.Price +product3.Price + product4.Price;
                     orders.Add(new Order
                     {
                         CustomerId = customersId[(orderNumber - 1) % customersId.Count],
+
                         Items = new List<OrderItem>
                         {
                             new OrderItem
                             {
-                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                ProductId = product1.Id,
                                 Quantity = 1,
-                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                                UnitPrice = product1.Price
                             },
                             new OrderItem
                             {
-                                 ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                 ProductId = product2.Id,
                                 Quantity = 1,
-                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                                UnitPrice = product2.Price
                             },
                             new OrderItem
                             {
-                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                ProductId = product3.Id,
                                 Quantity = 1,
-                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                                UnitPrice = product3.Price
                             },
                             new OrderItem{
-                                ProductId = products[(orderNumber - 1) % products.Count].Id,
+                                ProductId = product4.Id,
                                 Quantity = 1,
-                                UnitPrice = products[(orderNumber - 1) % products.Count].Price
+                                UnitPrice = product4.Price
                             }
                         },
-                        Subtotal = 0,
-                        TotalCost = 0
+                        Subtotal = subtotal,
+                        TotalCost = subtotal
                     });
                 }
+                _context.Orders.AddRange(orders);
+
+                await _context.SaveChangesAsync(cancellationToken);
+
+                _context.ChangeTracker.Clear();
             }
         }
 
