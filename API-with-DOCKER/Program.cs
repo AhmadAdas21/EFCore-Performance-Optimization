@@ -11,6 +11,8 @@ using API_with_DOCKER.DesignsPatterns.ChainOfResponsibility;
 using API_with_DOCKER.DesignsPatterns.Adapter;
 using API_with_DOCKER.ThirdPartyPayment;
 using API_with_DOCKER.DesignsPatterns.Results;
+using System.Diagnostics;
+using API_with_DOCKER.Seeding;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
@@ -90,20 +92,58 @@ builder.Services.AddScoped<IOrderValidationHandler>(sp =>
 });
 builder.Services.AddScoped<FakePaymentPlatform>();
 builder.Services.AddScoped<IPaymentService, PaymentAdapter>();
+builder.Services.AddScoped<DataSeeder>();
 
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
 
+
+if (args.Contains("--seed-performance-data") &&!app.Environment.IsDevelopment())
+{
+    throw new InvalidOperationException("Performance seeding is allowed only in Development.");
+}
+
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
 
-    var db = scope.ServiceProvider
-        .GetRequiredService<AppDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    bool seedRequested = args.Contains("--seed-performance-data");
+
+    if (seedRequested)
+    {
+        var databaseName = db.Database.GetDbConnection().Database;
+
+        if (!string.Equals(databaseName, "EFCorePerformanceDb",StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Seeding is allowed only for EFCorePerformanceDb.");
+        }
+    }
 
     await db.Database.MigrateAsync();
+
+    if (seedRequested)
+    {
+        var seeder = scope.ServiceProvider
+            .GetRequiredService<DataSeeder>();
+
+        var stopwatch = Stopwatch.StartNew();
+
+        await seeder.SeedCustomerValuesAsync(CancellationToken.None);
+        await seeder.SeedProductValuesAsync(CancellationToken.None);
+        await seeder.SeedOrderValuesAsync(CancellationToken.None);
+
+        stopwatch.Stop();
+
+        Console.WriteLine(
+            $"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds");
+
+        return;
+    }
 }
+
 
 // HTTP Pipeline
 if (app.Environment.IsDevelopment())
