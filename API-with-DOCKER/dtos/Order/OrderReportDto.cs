@@ -3,9 +3,9 @@
     public record OrderReportDto
     {
         public int OrderId { get; init; }
-        public string CustomerId { get; init; } = string.Empty;
+        public int CustomerId { get; init; } 
         public DateTime CreatedDate { get; init; }
-        public decimal TotalAmount { get; init; }
-        public int TotalItems { get; init; }
+        public decimal TotalCoast { get; init; }
+        public int ItemCount { get; init; }
     }
 }
