@@ -98,6 +98,7 @@ builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<SlowOrderReportServices>();
 builder.Services.AddScoped<SqlQueryCounter>();
 builder.Services.AddScoped<SqlQueryCounterInterceptor>();
+builder.Services.AddScoped<OptimizedOrderReportService>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
