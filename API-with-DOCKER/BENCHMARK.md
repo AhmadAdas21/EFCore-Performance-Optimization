@@ -43,3 +43,25 @@ Replace the per-order CountAsync queries with
 server-side projection and aggregation.
 
 Target: Reduce the report to one SQL query per request.
+## Optimized vs Slow — Final Comparison
+
+Environment: Local Docker, SQL Server 2022, EF Core 8
+Page Size: 100
+Samples: 5 requests per implementation
+
+| Metric | Slow | Optimized |
+|--------|------|-----------|
+| SQL Commands | 101 | 1 |
+| Avg HTTP Time | 99.87 ms | 7.14 ms |
+| Median HTTP Time | 86.60 ms | 6.72 ms |
+
+Results:
+- SQL command reduction: 99.01%
+- Average response time reduction: 92.85%
+- Speedup: approximately 14x
+
+Methodology:
+- Alternating requests to both endpoints.
+- SQL commands verified using DbCommandInterceptor.
+- HTTP timings measured with curl.
+- Results are local benchmark measurements.
