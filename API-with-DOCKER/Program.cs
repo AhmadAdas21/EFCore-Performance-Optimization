@@ -13,6 +13,7 @@ using API_with_DOCKER.ThirdPartyPayment;
 using API_with_DOCKER.DesignsPatterns.Results;
 using System.Diagnostics;
 using API_with_DOCKER.Seeding;
+using API_with_DOCKER.services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
@@ -93,7 +94,7 @@ builder.Services.AddScoped<IOrderValidationHandler>(sp =>
 builder.Services.AddScoped<FakePaymentPlatform>();
 builder.Services.AddScoped<IPaymentService, PaymentAdapter>();
 builder.Services.AddScoped<DataSeeder>();
-
+builder.Services.AddScoped<SlowOrderReportServices>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
