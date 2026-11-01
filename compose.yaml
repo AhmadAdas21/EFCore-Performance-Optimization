@@ -24,13 +24,18 @@ services:
       - app-network
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: Developer
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-    volumes:
-      - sql_data:/var/opt/mssql
+  image: mcr.microsoft.com/mssql/server:2022-latest
+
+  ports:
+    - "127.0.0.1:1434:1433"
+
+  environment:
+    ACCEPT_EULA: "Y"
+    MSSQL_PID: Developer
+    MSSQL_SA_PASSWORD: "YOUR_EXISTING_PASSWORD"
+
+  volumes:
+    - sql_data:/var/opt/mssql
     healthcheck:
       test:
         - CMD-SHELL
