@@ -13,7 +13,7 @@ using API_with_DOCKER.ThirdPartyPayment;
 using API_with_DOCKER.DesignsPatterns.Results;
 using System.Diagnostics;
 using API_with_DOCKER.Seeding;
-using API_with_DOCKER.services;
+using API_with_DOCKER.Performance;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
@@ -50,9 +50,7 @@ builder.Services.AddScoped<NormalPricingStrategy>();
 builder.Services.AddScoped<VipPricingStrategy>();
 builder.Services.AddScoped<BlackFridayPricingStrategy>();
 
-builder.Services.AddScoped<
-    IPricingStrategyResolver,
-    PricingStrategyResolver>();
+builder.Services.AddScoped<IPricingStrategyResolver,PricingStrategyResolver>();
 
 // Factory Pattern
 builder.Services.AddScoped<EmailNotification>();
@@ -95,6 +93,7 @@ builder.Services.AddScoped<FakePaymentPlatform>();
 builder.Services.AddScoped<IPaymentService, PaymentAdapter>();
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<SlowOrderReportServices>();
+builder.Services.AddScoped<SqlQueryCounter>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");

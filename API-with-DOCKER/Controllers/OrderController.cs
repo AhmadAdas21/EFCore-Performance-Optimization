@@ -54,15 +54,14 @@ namespace API_with_DOCKER.Controllers
             };
         }
         [HttpGet("report")]
-        public async Task<IActionResult> GetSlowOrderReport([FromQuery]int page=1,[FromQuery]int pageSize=15, CancellationToken cancellationToken) 
+        public async Task<IActionResult> GetSlowOrderReport(CancellationToken cancellationToken=default, [FromQuery] int page = 1, [FromQuery] int pageSize = 15)
         {
-            if (page <= 0 || pageSize <= 0)
+            if (page <= 0 || pageSize <= 0 || pageSize > 100)
             {
-               return BadRequest("the page and the page size must be above 0");
+                return BadRequest("the page and the page size must be above 0");
             }
-            var reports = await _slowReportService.GetSlowReportAsync(page, pageSize,cancellationToken);
+            var reports = await _slowReportService.GetSlowReportAsync(page, pageSize, cancellationToken);
             return Ok(reports);
-         
         }
 
 
