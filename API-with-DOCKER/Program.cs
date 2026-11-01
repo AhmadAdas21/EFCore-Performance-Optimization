@@ -13,7 +13,7 @@ using API_with_DOCKER.ThirdPartyPayment;
 using API_with_DOCKER.DesignsPatterns.Results;
 using System.Diagnostics;
 using API_with_DOCKER.Seeding;
-using API_with_DOCKER.services;
+using API_with_DOCKER.Performance;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
@@ -50,9 +50,7 @@ builder.Services.AddScoped<NormalPricingStrategy>();
 builder.Services.AddScoped<VipPricingStrategy>();
 builder.Services.AddScoped<BlackFridayPricingStrategy>();
 
-builder.Services.AddScoped<
-    IPricingStrategyResolver,
-    PricingStrategyResolver>();
+builder.Services.AddScoped<IPricingStrategyResolver,PricingStrategyResolver>();
 
 // Factory Pattern
 builder.Services.AddScoped<EmailNotification>();
@@ -64,11 +62,14 @@ builder.Services.AddScoped<
     NotificationFactory>();
 
 // Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
+    options.UseSqlServer( builder.Configuration.GetConnectionString("DefaultConnection"));
+
+    options.AddInterceptors(sp.GetRequiredService<SqlQueryCounterInterceptor>());
+});
+
 
 builder.Services.AddHealthChecks();
 
@@ -95,6 +96,8 @@ builder.Services.AddScoped<FakePaymentPlatform>();
 builder.Services.AddScoped<IPaymentService, PaymentAdapter>();
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<SlowOrderReportServices>();
+builder.Services.AddScoped<SqlQueryCounter>();
+builder.Services.AddScoped<SqlQueryCounterInterceptor>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
@@ -155,6 +158,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<BenchmarkMiddleware>();
 app.MapControllers();
 
 app.MapGet("/api/products/{id:int}",async (int id, IProductServices service) =>
