@@ -62,11 +62,14 @@ builder.Services.AddScoped<
     NotificationFactory>();
 
 // Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
+    options.UseSqlServer( builder.Configuration.GetConnectionString("DefaultConnection"));
+
+    options.AddInterceptors(sp.GetRequiredService<SqlQueryCounterInterceptor>());
+});
+
 
 builder.Services.AddHealthChecks();
 
@@ -94,6 +97,7 @@ builder.Services.AddScoped<IPaymentService, PaymentAdapter>();
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<SlowOrderReportServices>();
 builder.Services.AddScoped<SqlQueryCounter>();
+builder.Services.AddScoped<SqlQueryCounterInterceptor>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
@@ -154,6 +158,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<BenchmarkMiddleware>();
 app.MapControllers();
 
 app.MapGet("/api/products/{id:int}",async (int id, IProductServices service) =>
