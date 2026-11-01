@@ -5,7 +5,7 @@ services:
       dockerfile: API-with-DOCKER/DockerFile
     image: efcore-performance-api:v1
     ports:
-      - "8086:8080"
+         - "8087:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
@@ -24,18 +24,15 @@ services:
       - app-network
 
   sqlserver:
-  image: mcr.microsoft.com/mssql/server:2022-latest
-
-  ports:
-    - "127.0.0.1:1434:1433"
-
-  environment:
-    ACCEPT_EULA: "Y"
-    MSSQL_PID: Developer
-    MSSQL_SA_PASSWORD: "YOUR_EXISTING_PASSWORD"
-
-  volumes:
-    - sql_data:/var/opt/mssql
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "127.0.0.1:1434:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    volumes:
+      - sql_data:/var/opt/mssql
     healthcheck:
       test:
         - CMD-SHELL
@@ -63,4 +60,3 @@ networks:
 
 volumes:
   sql_data:
-
