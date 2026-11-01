@@ -67,6 +67,11 @@ namespace API_with_DOCKER.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("CreatedAtUtc", "Id")
+                        .IsDescending();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("CreatedAtUtc", "Id"), new[] { "CustomerId", "TotalCost" });
+
                     b.ToTable("Orders");
                 });
 

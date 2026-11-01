@@ -65,3 +65,44 @@ Methodology:
 - SQL commands verified using DbCommandInterceptor.
 - HTTP timings measured with curl.
 - Results are local benchmark measurements.
+
+## Index Optimization — Recent Orders
+
+### Problem
+The query retrieved the latest 100 orders by scanning
+50,000 rows and performing a TopN Sort.
+
+### Solution
+Created a composite covering nonclustered index:
+
+CREATE INDEX IX_Orders_CreatedAtUtc_Id
+ON Orders (CreatedAtUtc DESC, Id DESC)
+INCLUDE (CustomerId, TotalCost);
+
+### Benchmark Results
+
+| Metric | Old Plan | Optimized Plan |
+|---|---|---|
+| Logical Reads | 457 | 2 |
+| Rows Read | 50,000 | 100 |
+| Sort Operator | TopN Sort | Eliminated |
+| Average Elapsed Time | 52.4 ms | 0 ms reported |
+| Median Elapsed Time | 52 ms | 0 ms reported |
+
+### Findings
+- Logical reads reduced by 99.56%.
+- Rows read reduced by 99.8%.
+- The new index supports ordered retrieval.
+- The TopN Sort operator was eliminated.
+- No Key Lookup was required.
+
+### Methodology
+- SQL Server 2022 running in Docker.
+- Database: EFCoreIndexLab.
+- 50,000 Orders and 200,000 OrderItems.
+- 10 alternating executions after warm-up.
+- Old plan reproduced using INDEX(PK_Orders).
+- Optimized plan used automatic index selection.
+- SQL Server reported optimized execution times
+  as 0 ms due to timer resolution.
+- Results measure SQL execution, not HTTP latency.

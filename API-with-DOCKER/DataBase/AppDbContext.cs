@@ -18,6 +18,7 @@ namespace API_with_DOCKER.DataBase
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
 
             modelBuilder.Entity<Order>()
                 .HasOne(order => order.Customer)
@@ -45,6 +46,14 @@ namespace API_with_DOCKER.DataBase
 
             modelBuilder.Entity<OrderItem>()
                 .Property(item => item.UnitPrice);
+
+
+            modelBuilder.Entity<Order>().HasIndex(o => new { o.CreatedAtUtc, o.Id }).IsDescending(true, true).IncludeProperties(o => new
+            {
+                o.CustomerId,
+                o.TotalCost
+            } 
+            );
 
         }
     }
