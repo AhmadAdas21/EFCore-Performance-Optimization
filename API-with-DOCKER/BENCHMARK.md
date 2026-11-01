@@ -65,7 +65,6 @@ Methodology:
 - SQL commands verified using DbCommandInterceptor.
 - HTTP timings measured with curl.
 - Results are local benchmark measurements.
-- Results are local benchmark measurements.
 
 ## Index Optimization — Recent Orders
 
