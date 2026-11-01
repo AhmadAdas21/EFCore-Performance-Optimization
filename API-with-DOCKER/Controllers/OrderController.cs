@@ -12,10 +12,12 @@ namespace API_with_DOCKER.Controllers
     {
         private readonly IOrderServices _orderService;
         private readonly SlowOrderReportServices _slowReportService;
-        public OrderController(IOrderServices orderService, SlowOrderReportServices slowOrder)
+        private readonly OptimizedOrderReportService _optimizedReportService;
+        public OrderController(IOrderServices orderService, SlowOrderReportServices slowOrder, OptimizedOrderReportService optimizedReportService)
         {
             _orderService = orderService;
             _slowReportService = slowOrder;
+            _optimizedReportService = optimizedReportService;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
@@ -62,6 +64,19 @@ namespace API_with_DOCKER.Controllers
             }
             var reports = await _slowReportService.GetSlowReportAsync(page, pageSize, cancellationToken);
             return Ok(reports);
+        }
+
+        [HttpGet("report/optimized")]
+        public async Task<IActionResult> GetOptimizedOrderReport(CancellationToken cancellationToken,[FromQuery] int page = 1,[FromQuery] int pageSize = 15)
+        {
+            if (page <= 0 || pageSize <= 0 || pageSize > 100)
+            {
+                return BadRequest("Invalid pagination parameters.");
+            }
+
+            var report = await _optimizedReportService.GetOptimizedReportAsync(page, pageSize, cancellationToken);
+
+            return Ok(report);
         }
 
 
