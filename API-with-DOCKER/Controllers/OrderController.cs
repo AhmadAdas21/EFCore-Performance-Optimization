@@ -3,17 +3,19 @@ using API_with_DOCKER.dtos.Order;
 using API_with_DOCKER.interfaces;
 using API_with_DOCKER.models;
 using Microsoft.AspNetCore.Mvc;
-
+using API_with_DOCKER.services;
 namespace API_with_DOCKER.Controllers
 {
     [ApiController]
     [Route("api/orders")]
-    public class OrderController:ControllerBase
+    public class OrderController : ControllerBase
     {
-        private readonly  IOrderServices _orderService;
-        public OrderController(IOrderServices orderService)
+        private readonly IOrderServices _orderService;
+        private readonly SlowOrderReportServices _slowReportService;
+        public OrderController(IOrderServices orderService, SlowOrderReportServices slowOrder)
         {
             _orderService = orderService;
+            _slowReportService = slowOrder;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
@@ -27,7 +29,7 @@ namespace API_with_DOCKER.Controllers
         {
             var order = await _orderService.CreateOrderAsync(request, cancellationToken);
 
-            return StatusCode( StatusCodes.Status201Created, ToResponse(order));
+            return StatusCode(StatusCodes.Status201Created, ToResponse(order));
         }
 
         private static OrderResponse ToResponse(Order order)
@@ -50,6 +52,17 @@ namespace API_with_DOCKER.Controllers
 
                 }).ToList()
             };
+        }
+        [HttpGet("report")]
+        public async Task<IActionResult> GetSlowOrderReport([FromQuery]int page=1,[FromQuery]int pageSize=15, CancellationToken cancellationToken) 
+        {
+            if (page <= 0 || pageSize <= 0)
+            {
+               return BadRequest("the page and the page size must be above 0");
+            }
+            var reports = await _slowReportService.GetSlowReportAsync(page, pageSize,cancellationToken);
+            return Ok(reports);
+         
         }
 
 
