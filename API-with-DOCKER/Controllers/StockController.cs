@@ -25,6 +25,7 @@ namespace API_with_DOCKER.Controllers
                 ResultStatus.NotFound =>NotFound(purchase.Error),
                 ResultStatus.Conflict =>Conflict(purchase.Error),
                 ResultStatus.Failure =>StatusCode(500, purchase.Error),
+                _ => StatusCode(500, "unexpected result status")
 
             };
            
