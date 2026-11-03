@@ -1,0 +1,6 @@
+@API_with_DOCKER_HostAddress = http://localhost:5289
+
+GET {{API_with_DOCKER_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
