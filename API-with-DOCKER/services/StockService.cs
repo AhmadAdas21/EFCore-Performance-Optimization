@@ -36,6 +36,7 @@ namespace API_with_DOCKER.services
                 return Result<bool>.Conflict("product not found or the stock is zero ");
             }
 
+
         }
     }
 }
