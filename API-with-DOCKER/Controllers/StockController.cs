@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API_with_DOCKER.Controllers
 {
     [ApiController]
-    [Route("api/stock")]
+    [Route("api/inventory")]
     public class StockController:ControllerBase
     {
         private readonly StockService _stockService;
