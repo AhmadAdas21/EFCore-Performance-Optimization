@@ -13,7 +13,7 @@ namespace API_with_DOCKER.Tests
 {
     public  class StockConcurrencyTests
     {
-        
+       
        
 
         [Fact]
@@ -46,7 +46,7 @@ namespace API_with_DOCKER.Tests
 
 
             //assert
-
+            
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
         [Fact]
@@ -88,6 +88,10 @@ namespace API_with_DOCKER.Tests
             Assert.Equal(100, responses.Length);
             Assert.Equal(10, successCount);
             Assert.Equal(90, conflictCount);
+            var finalProduct = await client.GetFromJsonAsync<Product>($"/api/products/{productId}");
+
+
+            Assert.Equal(0, finalProduct.StockQuantity);
         }
 
     }
