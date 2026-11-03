@@ -99,6 +99,7 @@ builder.Services.AddScoped<SlowOrderReportServices>();
 builder.Services.AddScoped<SqlQueryCounter>();
 builder.Services.AddScoped<SqlQueryCounterInterceptor>();
 builder.Services.AddScoped<OptimizedOrderReportService>();
+builder.Services.AddScoped<StockService>();
 var app = builder.Build();
 
 app.MapHealthChecks("/health");
